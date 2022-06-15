@@ -26,25 +26,30 @@ class CustomerImpl(
       "\n" +
       "FROM db.cars "
 
-
-    if (from != -1) {
-      query += "limit $from,$limitNumber;"
-    }
+    if (from != -1) query += "limit $from,$limitNumber;"
 
     resultSet = connection.createStatement().executeQuery(query)
-    val cars = mutableListOf<Car>()
+
     while (resultSet.next()) {
-      cars.add(
-        Car(
-          id = resultSet.getInt("id"),
-          color = resultSet.getString("color"),
-          factoryName = resultSet.getString("factory_name"),
-          price = resultSet.getFloat("price"),
-          modelName = resultSet.getString("model_name"),
-          yearOfCreation = resultSet.getDate("year_of_creation")
-        )
+      val car = Car(
+        id = resultSet.getInt("id"),
+        color = resultSet.getString("color"),
+        factoryName = resultSet.getString("factory_name"),
+        price = resultSet.getFloat("price"),
+        modelName = resultSet.getString("model_name"),
+        yearOfCreation = resultSet.getDate("year_of_creation")
       )
+      printCar(car)
     }
-    println(cars.toString())
+  }
+
+  private fun printCar(car: Car) {
+    println(
+      "name: ${car.modelName}, " +
+        "color: ${car.color}, " +
+        "factory: ${car.factoryName}, " +
+        "price: ${car.price}, " +
+        "year of creation: ${car.yearOfCreation}"
+    )
   }
 }
