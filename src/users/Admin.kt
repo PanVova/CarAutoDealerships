@@ -83,15 +83,7 @@ class AdminImpl: Admin, Customer {
     TODO("Not yet implemented")
   }
 
-  override fun login() {
-    TODO("Not yet implemented")
-  }
-
-  override fun register() {
-    TODO("Not yet implemented")
-  }
-
-  override fun showCars() {
+  override fun showCars(from: Int) {
     TODO("Not yet implemented")
   }
 }

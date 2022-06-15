@@ -31,7 +31,7 @@ class MySQLDB {
   }
 
   fun showCars() {
-    customer.showCars()
+    customer.showCars(1)
   }
 
   companion object {
