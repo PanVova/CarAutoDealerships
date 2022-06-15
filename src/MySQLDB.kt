@@ -26,7 +26,7 @@ class MySQLDB {
       connection.close()
       println("Finished successfully")
     } catch (sqlEx: SQLException) {
-      println("Finished with error")
+      println("Finished with error: $sqlEx")
     }
   }
 
