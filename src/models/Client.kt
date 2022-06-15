@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 
-data class Clients(
+data class Client(
   val id: Int,
   val firstName: String,
   val lastName: String,
@@ -10,5 +10,6 @@ data class Clients(
   val phone: String,
   val birthDay: Date,
   val login: String,
-  val password: String
+  val password: String,
+  val roleName: String
 )

@@ -41,6 +41,7 @@ class CustomerImpl(
       )
       printCar(car)
     }
+    println()
   }
 
   private fun printCar(car: Car) {
