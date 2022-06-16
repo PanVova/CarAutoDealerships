@@ -12,4 +12,15 @@ data class Client(
   val login: String,
   val password: String,
   val roleName: String
-)
+){
+  fun print() {
+    println(
+      "firstName: ${firstName}, " +
+        "lastName: ${lastName}, " +
+        "address: ${address}, " +
+        "phone: ${phone}, " +
+        "birthDay: ${birthDay}, " +
+        "roleName: $roleName"
+    )
+  }
+}

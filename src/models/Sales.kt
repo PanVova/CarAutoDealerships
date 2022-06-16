@@ -9,4 +9,14 @@ data class Sales(
   val price: Float,
   val discount: Float,
   val totalSum: Float
-)
+) {
+  fun print(){
+    println(
+      "model name: ${modelName}, " +
+        "date of sale: ${dateOfSale}, " +
+        "price: ${price}, " +
+        "discount: ${discount}, " +
+        "totalSum: $totalSum"
+    )
+  }
+}

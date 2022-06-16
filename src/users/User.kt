@@ -1,12 +1,15 @@
 package users
 
+import models.Result
 import models.Role
+import utils.Queries
 import java.sql.Connection
 import java.sql.Date
 import java.sql.ResultSet
 import java.sql.SQLException
 
 interface User {
+  val userLogin: String
   fun login(login: String, password: String): Pair<Int, Role>
   fun register(
     firstName: String,
@@ -26,29 +29,27 @@ class UserImpl(
   private lateinit var resultSet: ResultSet
   private lateinit var query: String
 
-  lateinit var userLogin: String
+  override lateinit var userLogin: String
 
   override fun login(login: String, password: String): Pair<Int, Role> {
-    query =
-      "select exists(select * from db.clients where login = '${login}' and password = '${password}') as count;"
+    query = Queries.login(login, password)
     resultSet = connection.createStatement().executeQuery(query)
     resultSet.next()
+
     val count = resultSet.getInt("count")
     return if (count > 0) {
       println("Login successful")
       userLogin = login
-      query = " select role_id from db.clients where login = '${login}';"
+      query = Queries.getUserRole(login)
       resultSet = connection.createStatement().executeQuery(query)
       resultSet.next()
+
       val roleId = resultSet.getInt("role_id")
-      if (roleId == 1) {
-        Pair(0, Role.ADMIN)
-      } else {
-        Pair(0, Role.CUSTOMER)
-      }
+      if (roleId == Role.ADMIN.id) Pair(Result.SUCESS.type, Role.ADMIN) // check if user is admin or customer
+      else Pair(Result.SUCESS.type, Role.CUSTOMER)
     } else {
       println("This user doesn't exist or login or password is wrong")
-      Pair(-1, Role.CUSTOMER)
+      Pair(Result.ERROR.type, Role.CUSTOMER)
     }
   }
 
@@ -61,17 +62,14 @@ class UserImpl(
     login: String,
     password: String
   ): Pair<Int, Role> {
-    query =
-      "INSERT INTO db.clients (first_name, last_name, address, phone, birth_day, login, password)\n" +
-        "VALUES ('${firstName}', '${lastName}', '${address}', '${phone}', '${birthDay}', '${login}', '${password}' );\n" +
-        "\n"
+    query = Queries.register(firstName, lastName, address, phone, birthDay, login, password)
     return try {
       connection.createStatement().executeUpdate(query)
       println("Register successful")
-      Pair(0, Role.CUSTOMER)
+      Pair(Result.SUCESS.type, Role.CUSTOMER)
     } catch (sqlEx: SQLException) {
       println(sqlEx.message)
-      Pair(-1, Role.CUSTOMER)
+      Pair(Result.ERROR.type, Role.CUSTOMER)
     }
   }
 }

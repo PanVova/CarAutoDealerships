@@ -9,4 +9,14 @@ data class Car(
   val price: Float,
   val modelName: String,
   val yearOfCreation: Date
-)
+) {
+  fun print() {
+    println(
+      "name: ${modelName}, " +
+        "color: ${color}, " +
+        "factory: ${factoryName}, " +
+        "price: ${price}, " +
+        "year of creation: $yearOfCreation"
+    )
+  }
+}

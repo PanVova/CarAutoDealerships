@@ -50,23 +50,25 @@ Hello, customer. You have a few options today:
  3.close program
 ----------------------------"""
       )
-      val input = readLine() ?: ""
-      if (input == "1") {
-        println(
-          "Now from what id number you want to see available cars. If it doens't matter just enter 0"
-        )
-        val input2 = readLine() ?: ""
-        if (input2.toIntOrNull() != null) {
-          customer.showCars(input2.toInt())
-        } else {
-          customer.showCars()
+      when (readLine() ?: "") {
+        "1" -> {
+          println(
+            "Now from what id number you want to see available cars. If it doesn't matter just enter 0"
+          )
+          val from = readLine() ?: ""
+          if (from.toIntOrNull() != null) {
+            customer.showCars(from.toInt())
+          } else {
+            customer.showCars()
+          }
         }
-      } else if (input == "2") {
-        customer.showTransactionsOfUser("login") //TODO update this
-      } else if (input == "3") {
-        closeConnection()
-        exitProcess(0)
-      } else println("Wrong input")
+        "2" -> customer.showTransactionsOfUser(user.userLogin)
+        "3" -> {
+          closeConnection()
+          exitProcess(0)
+        }
+        else -> println("Wrong input")
+      }
     }
   }
 
@@ -74,53 +76,51 @@ Hello, customer. You have a few options today:
     var result: Pair<Int, Role>
     while (true) {
       println("Welcome:\n 1.Login\n 2.Register\n 3.exit program")
-      val input = readLine() ?: ""
-      if (input.toIntOrNull() != null && input.toInt() > 0 && input.toInt() <= 3) {
-        when (input.toInt()) {
-          1 -> {
-            println("Enter login:")
-            val login = readLine() ?: ""
+      when (readLine() ?: "") {
+        "1" -> {
+          println("Enter login:")
+          val login = readLine() ?: ""
 
-            println("Enter password:")
-            val password = readLine() ?: ""
+          println("Enter password:")
+          val password = readLine() ?: ""
 
-            result = user.login(login, password)
-            if (result.first == 0) {
-              break
-            }
+          result = user.login(login, password)
+          if (result.first == 0) {
+            break
           }
-          2 -> {
-            println("Enter firstName:")
-            val firstName = readLine() ?: ""
-
-            println("Enter lastName:")
-            val lastName = readLine() ?: ""
-
-            println("Enter address:")
-            val address = readLine() ?: ""
-
-            println("Enter phone number:")
-            val phone = readLine() ?: ""
-
-            println("Enter your birthday format (yyyy-mm-dd) :")
-            val dateInput = readLine() ?: "1990-01-02"
-            val birthDay = Date.valueOf(dateInput)
-
-            println("Enter login:")
-            val login = readLine() ?: ""
-
-            println("Enter password:")
-            val password = readLine() ?: ""
-
-            result =
-              user.register(firstName, lastName, address, phone, birthDay, login, password)
-            if (result.first == 0) {
-              break
-            }
-          }
-          3 -> exitProcess(0)
         }
-      } else println("Wrong input")
+        "2" -> {
+          println("Enter firstName:")
+          val firstName = readLine() ?: ""
+
+          println("Enter lastName:")
+          val lastName = readLine() ?: ""
+
+          println("Enter address:")
+          val address = readLine() ?: ""
+
+          println("Enter phone number:")
+          val phone = readLine() ?: ""
+
+          println("Enter your birthday format (yyyy-mm-dd) :")
+          val dateInput = readLine() ?: "1990-01-02"
+          val birthDay = Date.valueOf(dateInput)
+
+          println("Enter login:")
+          val login = readLine() ?: ""
+
+          println("Enter password:")
+          val password = readLine() ?: ""
+
+          result =
+            user.register(firstName, lastName, address, phone, birthDay, login, password)
+          if (result.first == 0) {
+            break
+          }
+        }
+        "3" -> exitProcess(0)
+        else -> println("Wrong input")
+      }
     }
     if (result.second == Role.CUSTOMER) {
       customer()
@@ -130,7 +130,6 @@ Hello, customer. You have a few options today:
   }
 
   private fun admin() {
-
     while (true) {
       println(
         """
@@ -149,123 +148,116 @@ Hello, customer. You have a few options today:
  11.show cars
  12.close program
 ------------------------------------"""
-
       )
       print("Your option: ")
-      val input = readLine() ?: ""
-      if (input.toIntOrNull() != null && input.toInt() > 0 && input.toInt() <= 12) {
-        when (input.toInt()) {
-          1 -> admin.getClients()
-          2 -> admin.getRoles()
-          3 -> admin.getFactories()
-          4 -> {
-            println("Enter a new factory name")
-            val input2 = readLine() ?: ""
-            if (input2 == "") println("Wrong input")
-            else admin.addFactory(input2)
-          }
-          5 -> {
-            println("Enter an old factory name")
-            val oldFactoryName = readLine() ?: ""
-            if (oldFactoryName == "") println("Wrong input")
-            else {
-              println("Enter a new factory name")
-              val updatedFactoryName = readLine() ?: ""
-              if (updatedFactoryName == "") println("Wrong input")
-              admin.updateFactory(oldFactoryName, updatedFactoryName)
-            }
-          }
-          6 -> admin.getPricesList()
-          7 -> {
-            println("Enter new price list")
-            val input2 = readLine() ?: ""
-            if (input2.toFloatOrNull() != null && input2.toFloat() > 0F) println("Wrong input")
-            else admin.addPriceList(input2.toFloat())
-          }
-          8 -> {
-            println("Enter car name")
-            val carName = readLine() ?: ""
-            if (carName == "") println("Wrong input")
-            else {
-              println("Enter color")
-              val color = readLine() ?: ""
-              if (color == "") println("Wrong input")
-              else {
-                println("Enter price from price list")
-                val price = readLine() ?: ""
-                if (price.toFloatOrNull() == null || price.toFloat() < 0) println("Wrong input")
-                else {
-                  println("Enter factory name")
-                  val factoryName = readLine() ?: ""
-                  if (factoryName == "") println("Wrong input")
-                  else {
-                    println("Enter date for car: Format YYYY-mm-dd")
-                    val date = readLine() ?: ""
-                    if (date != "") {
-                      admin.addCar(
-                        color = color, factoryName = factoryName, price = price.toFloat(),
-                        modelName = carName,
-                        Date.valueOf(date)
-                      )
-                    } else println("Wrong input")
-                  }
-                }
-              }
-            }
-          }
-          9 -> {
-            println("Enter a car that you want to delete")
-            val carName = readLine() ?: ""
-            if (carName == "") println("Wrong input")
-            else admin.deleteCar(carName)
-          }
-          10 -> {
-            println("Enter car name")
-            val carName = readLine() ?: ""
-            if (carName == "") println("Wrong input")
-            else {
-              println("Enter a client login")
-              val clientLogin = readLine() ?: ""
-              if (clientLogin == "") println("Wrong input")
-              else {
-                println("Enter price from price list")
-                val price = readLine() ?: ""
-                if (price.toFloatOrNull() == null || price.toFloat() < 0) println("Wrong input")
-                else {
-                  println("Enter discount if any")
-                  val discount = readLine() ?: ""
-                  if (discount.toFloatOrNull() == null || discount.toFloat() < 0) {
-                    println("Wrong input for discount we will count it as 0")
-                    admin.makeOrder(carName, clientLogin, price.toFloat())
-                  } else {
-                    admin.makeOrder(carName, clientLogin, price.toFloat(), discount.toFloat())
-                  }
-                }
-              }
-            }
-          }
-          11 -> customer.showCars()
-          12 -> exitProcess(0)
-        }
-      } else println("Wrong input")
+      val option = readLine() ?: ""
+      when (option.toInt()) {
+        1 -> admin.getClients()
+        2 -> admin.getRoles()
+        3 -> admin.getFactories()
+        4 -> addFactory()
+        5 -> updateFactory()
+        6 -> admin.getPricesList()
+        7 -> addPriceList()
+        8 -> addCar()
+        9 -> deleteCar()
+        10 -> makeOrder()
+        11 -> customer.showCars()
+        12 -> exitProcess(0)
+        else -> println("Wrong input")
+      }
     }
   }
 
-  fun testMethods() {
-    customer.showCars(1)
-    admin.getClients()
-    admin.getRoles()
-    admin.getFactories()
-    admin.addFactory("Porsche")
-    admin.updateFactory("Porsche", "k2")
-    admin.getPricesList()
-    admin.addPriceList(100F)
-    admin.deleteCar("V5")
-    admin.addCar(
-      color = "Blue", factoryName = "Mazda", price = 20000F, modelName = "V15",
-      Date.valueOf("1993-06-10")
-    )
-    admin.makeOrder("V15", clientLogin = "login", price = 20000F, discount = 1000F)
+  private fun makeOrder() {
+    println("Enter car name")
+    val carName = readLine() ?: ""
+    if (carName == "") println("Wrong input")
+    else {
+      println("Enter a client login")
+      val clientLogin = readLine() ?: ""
+      if (clientLogin == "") println("Wrong input")
+      else {
+        println("Enter price from price list")
+        val price = readLine() ?: ""
+        if (price.toFloatOrNull() == null || price.toFloat() < 0) println("Wrong input")
+        else {
+          println("Enter discount if any")
+          val discount = readLine() ?: ""
+          if (discount.toFloatOrNull() == null || discount.toFloat() < 0) {
+            println("Wrong input for discount we will count it as 0")
+            admin.makeOrder(carName, clientLogin, price.toFloat())
+          } else {
+            admin.makeOrder(carName, clientLogin, price.toFloat(), discount.toFloat())
+          }
+        }
+      }
+    }
+  }
+
+  private fun deleteCar() {
+    println("Enter a car that you want to delete")
+    val carName = readLine() ?: ""
+    if (carName == "") println("Wrong input")
+    else admin.deleteCar(carName)
+  }
+
+  private fun addCar() {
+    println("Enter car name")
+    val carName = readLine() ?: ""
+    if (carName == "") println("Wrong input")
+    else {
+      println("Enter color")
+      val color = readLine() ?: ""
+      if (color == "") println("Wrong input")
+      else {
+        println("Enter price from price list")
+        val price = readLine() ?: ""
+        if (price.toFloatOrNull() == null || price.toFloat() < 0) println("Wrong input")
+        else {
+          println("Enter factory name")
+          val factoryName = readLine() ?: ""
+          if (factoryName == "") println("Wrong input")
+          else {
+            println("Enter date for car: Format YYYY-mm-dd")
+            val date = readLine() ?: ""
+            if (date != "") {
+              admin.addCar(
+                color = color, factoryName = factoryName, price = price.toFloat(),
+                modelName = carName,
+                Date.valueOf(date)
+              )
+            } else println("Wrong input")
+          }
+        }
+      }
+    }
+  }
+
+  private fun addPriceList() {
+    println("Enter new price list")
+    val price = readLine() ?: ""
+    if (price.toFloatOrNull() != null && price.toFloat() > 0F) println("Wrong input")
+    else admin.addPriceList(price.toFloat())
+  }
+
+  private fun updateFactory() {
+    println("Enter an old factory name")
+    val oldFactoryName = readLine() ?: ""
+    if (oldFactoryName == "") println("Wrong input")
+    else {
+      println("Enter a new factory name")
+      val updatedFactoryName = readLine() ?: ""
+      if (updatedFactoryName == "") println("Wrong input")
+      admin.updateFactory(oldFactoryName, updatedFactoryName)
+    }
+  }
+
+  private fun addFactory() {
+    println("Enter a new factory name")
+    val input2 = readLine() ?: ""
+    if (input2 == "") println("Wrong input")
+    else admin.addFactory(input2)
   }
 
   companion object {
