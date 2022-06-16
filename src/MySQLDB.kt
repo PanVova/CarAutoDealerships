@@ -1,3 +1,4 @@
+import models.Role
 import users.Admin
 import users.AdminImpl
 import users.Customer
@@ -38,14 +39,19 @@ class MySQLDB {
     }
   }
 
-  fun customer() {
+  private fun customer() {
     while (true) {
       println(
-        "Hello. Welcome home. You have a few options today:\n 1.show cars\n 2.show my transactions\n 3.close program"
+        """
+----------------------------
+Hello, customer. You have a few options today:
+ 1.show cars
+ 2.show my transactions
+ 3.close program
+----------------------------"""
       )
       val input = readLine() ?: ""
-      if (input != "1" && input != "2") println("Wrong input")
-      else if (input == "1") {
+      if (input == "1") {
         println(
           "Now from what id number you want to see available cars. If it doens't matter just enter 0"
         )
@@ -60,12 +66,12 @@ class MySQLDB {
       } else if (input == "3") {
         closeConnection()
         exitProcess(0)
-      }
+      } else println("Wrong input")
     }
   }
 
-  fun user() {
-
+  fun loginOrRegister() {
+    var result: Pair<Int, Role>
     while (true) {
       println("Welcome:\n 1.Login\n 2.Register\n 3.exit program")
       val input = readLine() ?: ""
@@ -78,8 +84,8 @@ class MySQLDB {
             println("Enter password:")
             val password = readLine() ?: ""
 
-            val result = user.login(login, password)
-            if (result == 0) {
+            result = user.login(login, password)
+            if (result.first == 0) {
               break
             }
           }
@@ -98,7 +104,7 @@ class MySQLDB {
 
             println("Enter your birthday format (yyyy-mm-dd) :")
             val dateInput = readLine() ?: "1990-01-02"
-            val birthDay = Date.valueOf(dateInput )
+            val birthDay = Date.valueOf(dateInput)
 
             println("Enter login:")
             val login = readLine() ?: ""
@@ -106,9 +112,9 @@ class MySQLDB {
             println("Enter password:")
             val password = readLine() ?: ""
 
-            val result =
+            result =
               user.register(firstName, lastName, address, phone, birthDay, login, password)
-            if (result == 0) {
+            if (result.first == 0) {
               break
             }
           }
@@ -116,13 +122,20 @@ class MySQLDB {
         }
       } else println("Wrong input")
     }
+    if (result.second == Role.CUSTOMER) {
+      customer()
+    } else if (result.second == Role.ADMIN) {
+      admin()
+    }
   }
 
-  fun admin() {
+  private fun admin() {
 
     while (true) {
       println(
-        """Hello. Welcome home admin. You have a few options today:
+        """
+------------------------------------
+ Hello. Welcome home admin. You have a few options today:
  1.get information about clients
  2.get all available roles
  3.get information about all factories
@@ -132,10 +145,15 @@ class MySQLDB {
  7.add price list
  8.add car
  9.delete car
- 10.make an order"""
+ 10.make an order
+ 11.show cars
+ 12.close program
+------------------------------------"""
+
       )
+      print("Your option: ")
       val input = readLine() ?: ""
-      if (input.toIntOrNull() != null && input.toInt() > 0 && input.toInt() <= 11) {
+      if (input.toIntOrNull() != null && input.toInt() > 0 && input.toInt() <= 12) {
         when (input.toInt()) {
           1 -> admin.getClients()
           2 -> admin.getRoles()
@@ -226,6 +244,8 @@ class MySQLDB {
               }
             }
           }
+          11 -> customer.showCars()
+          12 -> exitProcess(0)
         }
       } else println("Wrong input")
     }

@@ -21,7 +21,6 @@ interface Admin {
   fun getPricesList()
   fun addPriceList(price: Float)
 
-
   fun addCar(
     color: String,
     factoryName: String,
@@ -149,6 +148,9 @@ class AdminImpl(
 
   override fun addPriceList(price: Float) {
     query = "insert into db.price_list(price) values ('${price}');"
+    if (price <= 0) {
+      println("You can't add negative or 0 price")
+    }
     try {
       connection.createStatement().executeUpdate(query)
     } catch (sqlEx: SQLException) {
