@@ -21,7 +21,6 @@ interface Admin {
   fun getPricesList()
   fun addPriceList(price: Float)
 
-  fun showTransactionsOfUser(login: String)
 
   fun addCar(
     color: String,
@@ -37,7 +36,7 @@ interface Admin {
     carModelName: String,
     clientLogin: String,
     price: Float,
-    discount: Float
+    discount: Float = 0F
   )
 }
 
@@ -191,52 +190,12 @@ class AdminImpl(
     println("Deleted successfully")
   }
 
-  override fun showTransactionsOfUser(login: String) {
-    query =
-      "select id,\n" +
-        "       (select model_name from db.cars where cars.id = sales.car_id) as model_name,\n" +
-        "       date_of_sale,\n" +
-        "       price,\n" +
-        "       discount,\n" +
-        "       total_sum\n" +
-        "from db.sales where (select id from db.clients where clients.login = '${login}');"
-
-    resultSet = connection.createStatement().executeQuery(query)
-    while (resultSet.next()) {
-      val sale = Sales(
-        id = resultSet.getInt("id"),
-        modelName = resultSet.getString("model_name"),
-        dateOfSale = resultSet.getDate("date_of_sale"),
-        price = resultSet.getFloat("price"),
-        discount = resultSet.getFloat("discount"),
-        totalSum = resultSet.getFloat("total_sum"),
-      )
-      printSale(sale)
-    }
-    println()
-  }
-
-  private fun printSale(sales: Sales) {
-    println(
-      "model name: ${sales.modelName}, " +
-        "date of sale: ${sales.dateOfSale}, " +
-        "price: ${sales.price}, " +
-        "discount: ${sales.discount}, " +
-        "totalSum: ${sales.totalSum}"
-    )
-  }
-
   override fun makeOrder(
     carModelName: String,
     clientLogin: String,
     price: Float,
     discount: Float
   ) {
-    // val nowDate = Date.from(Instant.now())
-    // val formatter: DateFormat = SimpleDateFormat("yyyy-MM-dd")
-    // val myDate: Date = formatter.parse(nowDate.toString()) as Date
-    // val sqlDate = Date(myDate.time)
-
     query = "insert into db.sales(car_id, client_id, date_of_sale, price, discount)\n" +
       "values ((select id from db.cars where cars.model_name = '${carModelName}'),\n" +
       "        (select id from db.clients where clients.login = '${clientLogin}'),\n" +

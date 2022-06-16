@@ -1,11 +1,13 @@
 package users
 
 import models.Car
+import models.Sales
 import java.sql.Connection
 import java.sql.ResultSet
 
 interface Customer {
   fun showCars(from: Int = -1)
+  fun showTransactionsOfUser(login: String)
 }
 
 class CustomerImpl(
@@ -42,6 +44,41 @@ class CustomerImpl(
       printCar(car)
     }
     println()
+  }
+
+  override fun showTransactionsOfUser(login: String) {
+    query =
+      "select id,\n" +
+        "       (select model_name from db.cars where cars.id = sales.car_id) as model_name,\n" +
+        "       date_of_sale,\n" +
+        "       price,\n" +
+        "       discount,\n" +
+        "       total_sum\n" +
+        "from db.sales where (select id from db.clients where clients.login = '${login}');"
+
+    resultSet = connection.createStatement().executeQuery(query)
+    while (resultSet.next()) {
+      val sale = Sales(
+        id = resultSet.getInt("id"),
+        modelName = resultSet.getString("model_name"),
+        dateOfSale = resultSet.getDate("date_of_sale"),
+        price = resultSet.getFloat("price"),
+        discount = resultSet.getFloat("discount"),
+        totalSum = resultSet.getFloat("total_sum"),
+      )
+      printSale(sale)
+    }
+    println()
+  }
+
+  private fun printSale(sales: Sales) {
+    println(
+      "model name: ${sales.modelName}, " +
+        "date of sale: ${sales.dateOfSale}, " +
+        "price: ${sales.price}, " +
+        "discount: ${sales.discount}, " +
+        "totalSum: ${sales.totalSum}"
+    )
   }
 
   private fun printCar(car: Car) {

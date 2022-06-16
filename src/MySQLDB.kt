@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.sql.Date
 import java.sql.DriverManager
 import java.sql.SQLException
+import kotlin.system.exitProcess
 
 class MySQLDB {
 
@@ -33,6 +34,145 @@ class MySQLDB {
     }
   }
 
+  fun customer() {
+    while (true) {
+      println(
+        "Hello. Welcome home. You have a few options today:\n 1.show cars\n 2.show my transactions\n 3.close program"
+      )
+      val input = readLine() ?: ""
+      if (input != "1" && input != "2") println("Wrong input")
+      else if (input == "1") {
+        println(
+          "Now from what id number you want to see available cars. If it doens't matter just enter 0"
+        )
+        val input2 = readLine() ?: ""
+        if (input2.toIntOrNull() != null) {
+          customer.showCars(input2.toInt())
+        } else {
+          customer.showCars()
+        }
+      } else if (input == "2") {
+        customer.showTransactionsOfUser("login") //TODO update this
+      } else if (input == "3") {
+        closeConnection()
+        exitProcess(0)
+      }
+    }
+  }
+
+  fun admin() {
+
+    while (true) {
+      println(
+        """Hello. Welcome home admin. You have a few options today:
+ 1.get information about clients
+ 2.get all available roles
+ 3.get information about all factories
+ 4.add factory
+ 5.edit factory
+ 6.get prices list
+ 7.add price list
+ 8.add car
+ 9.delete car
+ 10.make an order"""
+      )
+      val input = readLine() ?: ""
+      if (input.toIntOrNull() != null && input.toInt() > 0 && input.toInt() <= 11) {
+        when (input.toInt()) {
+          1 -> admin.getClients()
+          2 -> admin.getRoles()
+          3 -> admin.getFactories()
+          4 -> {
+            println("Enter a new factory name")
+            val input2 = readLine() ?: ""
+            if (input2 == "") println("Wrong input")
+            else admin.addFactory(input2)
+          }
+          5 -> {
+            println("Enter an old factory name")
+            val oldFactoryName = readLine() ?: ""
+            if (oldFactoryName == "") println("Wrong input")
+            else {
+              println("Enter a new factory name")
+              val updatedFactoryName = readLine() ?: ""
+              if (updatedFactoryName == "") println("Wrong input")
+              admin.updateFactory(oldFactoryName, updatedFactoryName)
+            }
+          }
+          6 -> admin.getPricesList()
+          7 -> {
+            println("Enter new price list")
+            val input2 = readLine() ?: ""
+            if (input2.toFloatOrNull() != null && input2.toFloat() > 0F) println("Wrong input")
+            else admin.addPriceList(input2.toFloat())
+          }
+          8 -> {
+            println("Enter car name")
+            val carName = readLine() ?: ""
+            if (carName == "") println("Wrong input")
+            else {
+              println("Enter color")
+              val color = readLine() ?: ""
+              if (color == "") println("Wrong input")
+              else {
+                println("Enter price from price list")
+                val price = readLine() ?: ""
+                if (price.toFloatOrNull() == null || price.toFloat() < 0) println("Wrong input")
+                else {
+                  println("Enter factory name")
+                  val factoryName = readLine() ?: ""
+                  if (factoryName == "") println("Wrong input")
+                  else {
+                    println("Enter date for car: Format YYYY-mm-dd")
+                    val date = readLine() ?: ""
+                    if (date != "") {
+                      admin.addCar(
+                        color = color, factoryName = factoryName, price = price.toFloat(),
+                        modelName = carName,
+                        Date.valueOf(date)
+                      )
+                    } else println("Wrong input")
+                  }
+                }
+              }
+            }
+          }
+          9 -> {
+            println("Enter a car that you want to delete")
+            val carName = readLine() ?: ""
+            if (carName == "") println("Wrong input")
+            else admin.deleteCar(carName)
+          }
+          10 -> {
+            println("Enter car name")
+            val carName = readLine() ?: ""
+            if (carName == "") println("Wrong input")
+            else {
+              println("Enter a client login")
+              val clientLogin = readLine() ?: ""
+              if (clientLogin == "") println("Wrong input")
+              else {
+                println("Enter price from price list")
+                val price = readLine() ?: ""
+                if (price.toFloatOrNull() == null || price.toFloat() < 0) println("Wrong input")
+                else {
+                  println("Enter discount if any")
+                  val discount = readLine() ?: ""
+                  if (discount.toFloatOrNull() == null || discount.toFloat() < 0) {
+                    println("Wrong input for discount we will count it as 0")
+                    admin.makeOrder(carName, clientLogin, price.toFloat())
+                  } else {
+                    admin.makeOrder(carName, clientLogin, price.toFloat(), discount.toFloat())
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else println("Wrong input")
+    }
+  }
+
   fun testMethods() {
     customer.showCars(1)
     admin.getClients()
@@ -48,7 +188,6 @@ class MySQLDB {
       Date.valueOf("1993-06-10")
     )
     admin.makeOrder("V15", clientLogin = "login", price = 20000F, discount = 1000F)
-    admin.showTransactionsOfUser("login")
   }
 
   companion object {
