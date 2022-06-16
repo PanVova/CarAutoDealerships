@@ -2,7 +2,8 @@ fun main() {
   val dbInstance = MySQLDB()
   dbInstance.apply {
     openConnection()
-    admin()
+    //admin()
+    user()
     closeConnection()
   }
 }

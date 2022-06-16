@@ -2,6 +2,8 @@ import users.Admin
 import users.AdminImpl
 import users.Customer
 import users.CustomerImpl
+import users.User
+import users.UserImpl
 import java.sql.Connection
 import java.sql.Date
 import java.sql.DriverManager
@@ -14,12 +16,14 @@ class MySQLDB {
 
   private lateinit var customer: Customer
   private lateinit var admin: Admin
+  private lateinit var user: User
 
   fun openConnection() {
     try {
-      connection = DriverManager.getConnection(url, user, password)
+      connection = DriverManager.getConnection(url, login, password)
       customer = CustomerImpl(connection)
       admin = AdminImpl(connection)
+      user = UserImpl(connection)
     } catch (sqlEx: SQLException) {
       println("Can't connect to mysql database")
     }
@@ -57,6 +61,60 @@ class MySQLDB {
         closeConnection()
         exitProcess(0)
       }
+    }
+  }
+
+  fun user() {
+
+    while (true) {
+      println("Welcome:\n 1.Login\n 2.Register\n 3.exit program")
+      val input = readLine() ?: ""
+      if (input.toIntOrNull() != null && input.toInt() > 0 && input.toInt() <= 3) {
+        when (input.toInt()) {
+          1 -> {
+            println("Enter login:")
+            val login = readLine() ?: ""
+
+            println("Enter password:")
+            val password = readLine() ?: ""
+
+            val result = user.login(login, password)
+            if (result == 0) {
+              break
+            }
+          }
+          2 -> {
+            println("Enter firstName:")
+            val firstName = readLine() ?: ""
+
+            println("Enter lastName:")
+            val lastName = readLine() ?: ""
+
+            println("Enter address:")
+            val address = readLine() ?: ""
+
+            println("Enter phone number:")
+            val phone = readLine() ?: ""
+
+            println("Enter your birthday format (yyyy-mm-dd) :")
+            val dateInput = readLine() ?: "1990-01-02"
+            val birthDay = Date.valueOf(dateInput )
+
+            println("Enter login:")
+            val login = readLine() ?: ""
+
+            println("Enter password:")
+            val password = readLine() ?: ""
+
+            val result =
+              user.register(firstName, lastName, address, phone, birthDay, login, password)
+            if (result == 0) {
+              break
+            }
+          }
+          3 -> exitProcess(0)
+        }
+      } else println("Wrong input")
     }
   }
 
@@ -192,7 +250,7 @@ class MySQLDB {
 
   companion object {
     private const val url = "jdbc:mysql://localhost:3306"
-    private const val user = "root"
+    private const val login = "root"
     private const val password = "1234"
   }
 }
